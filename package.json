@@ -1,5 +1,5 @@
 {
-  "name": "finalvfinal",
+  "name": "GitHub",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
@@ -7,18 +7,18 @@
     "start": "node server.js",
     "devStart": "nodemon server.js"
   },
+  "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "body-parser": "^1.20.2",
-    "ejs": "^3.1.9",
-    "express": "^4.18.2",
-    "express-ejs-layouts": "^2.5.1",
-    "mongodb": "^5.1.0",
-    "mongoose": "^7.0.3"
+    "body-parser": "^1.18.3",
+    "ejs": "^2.6.1",
+    "express": "^4.16.4",
+    "express-ejs-layouts": "^2.5.0",
+    "mongoose": "^5.4.18"
   },
   "devDependencies": {
-    "dotenv": "^16.0.3",
-    "nodemon": "^2.0.22"
+    "dotenv": "^6.2.0",
+    "nodemon": "^1.18.10"
   }
 }
