@@ -43,6 +43,7 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 const mongoose = require('mongoose')
+const user = require('/Work Archive/LapTrinhWeb/FINALVFINAL/models/user')
 mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true })
 const db = mongoose.connection
 db.on('error', error => console.error(error))
@@ -56,7 +57,8 @@ app.use('/books', bookRouter)
 
 
 app.get('/', checkAuthenticated, (req, res) => {
-  res.render('index.ejs', { name: req.user.name })
+  console.log(req.user)
+  res.render('login')
 })
 
 app.get('/login', checkNotAuthenticated, (req, res) => {
@@ -76,7 +78,7 @@ app.get('/register', checkNotAuthenticated, (req, res) => {
 app.post('/register', checkNotAuthenticated, async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10)
-    const users =  new users({
+    const users =  new User({
       username: req.body.username,
       email: req.body.email,
       password: hashedPassword
@@ -95,10 +97,12 @@ app.delete('/logout', (req, res) => {
 
 function checkAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
+    console.log('here')
     return next()
   }
-
-  res.redirect('/login')
+  else{
+    res.redirect('/login')
+  }
 }
 
 function checkNotAuthenticated(req, res, next) {

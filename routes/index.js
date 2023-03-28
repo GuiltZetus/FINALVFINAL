@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const Book = require('../models/book')
 
-router.get('/', async (req, res) => {
+router.get('/', checkAuthenticated, async (req, res) => {
   let books
   try {
     books = await Book.find().sort({ createdAt: 'desc' }).limit(10).exec()
@@ -11,5 +11,15 @@ router.get('/', async (req, res) => {
   }
   res.render('index', { books: books })
 })
+
+function checkAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    console.log('here')
+    return next()
+  }
+  else{
+    res.redirect('/login')
+  }
+}
 
 module.exports = router
