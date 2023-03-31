@@ -11,12 +11,14 @@ const bcrypt = require('bcrypt')
 const passport = require('passport')
 const flash = require('express-flash')
 const session = require('express-session')
+const {checkAuthenticated, checkNotAuthenticated} = require('./authenticates.js')
 
 
 const initializePassport = require('./passport-config')
+
 initializePassport(passport, 
-            email => User.find({email : email}),
-            id => User.find({id:id})
+                    email => User.findOne({email : email}).sort({_id: 1}),
+                    id => User.findOne({id : id}).sort({_id: 1})
 )
 
 
@@ -25,6 +27,7 @@ const User = require('/Work Archive/LapTrinhWeb/FINALVFINAL/models/user')
 const indexRouter = require('./routes/index')
 const authorRouter = require('./routes/authors')
 const bookRouter = require('./routes/books')
+const userRouter = require('./routes/users')
 
 app.set('view engine', 'ejs')
 app.set('views', __dirname + '/views')
@@ -52,12 +55,12 @@ db.once('open', () => console.log('Connected to Mongoose'))
 app.use('/', indexRouter)
 app.use('/authors', authorRouter)
 app.use('/books', bookRouter)
+app.use('/users', userRouter)
 
 // login
 
 
 app.get('/', checkAuthenticated, (req, res) => {
-  console.log(req.user)
   res.render('login')
 })
 
@@ -69,7 +72,8 @@ app.post('/login', checkNotAuthenticated, passport.authenticate('local', {
   successRedirect: '/',
   failureRedirect: '/login',
   failureFlash: true
-}))
+}), (req,res) => {
+})
 
 app.get('/register', checkNotAuthenticated, (req, res) => {
   res.render('register.ejs')
@@ -81,7 +85,8 @@ app.post('/register', checkNotAuthenticated, async (req, res) => {
     const users =  new User({
       username: req.body.username,
       email: req.body.email,
-      password: hashedPassword
+      password: hashedPassword,
+      role : 'basic'
     })
     const newUser = await users.save()
     res.redirect('/login')
@@ -94,22 +99,4 @@ app.delete('/logout', (req, res) => {
   req.logOut()
   res.redirect('/login')
 })
-
-function checkAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) {
-    console.log('here')
-    return next()
-  }
-  else{
-    res.redirect('/login')
-  }
-}
-
-function checkNotAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) {
-    return res.redirect('/')
-  }
-  next()
-}
-
 app.listen(process.env.PORT || 3000)

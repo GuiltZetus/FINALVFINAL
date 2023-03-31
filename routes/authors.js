@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const Author = require('../models/author')
 const Book = require('../models/book')
+const {checkAuthenticated, checkAuthenticateRole} = require('../authenticates')
 
 // All Authors Route
 router.get('/', async (req, res) => {
@@ -21,12 +22,12 @@ router.get('/', async (req, res) => {
 })
 
 // New Author Route
-router.get('/new', (req, res) => {
+router.get('/new',checkAuthenticated , (req, res) => {
   res.render('authors/new', { author: new Author() })
 })
 
 // Create Author Route
-router.post('/', async (req, res) => {
+router.post('/',checkAuthenticated , async (req, res) => {
   const author = new Author({
     name: req.body.name
   })
@@ -42,7 +43,7 @@ router.post('/', async (req, res) => {
 })
 
 
-router.get('/:id', async (req,res) =>{
+router.get('/:id' ,async (req,res) =>{
   try{
     const author = await Author.findById(req.params.id)
     const books = await Book.find({author : author.id}).limit(6).exec()
@@ -56,7 +57,7 @@ router.get('/:id', async (req,res) =>{
   }
 })
 
-router.get('/:id/edit', async (req,res) =>{
+router.get('/:id/edit',checkAuthenticated, async (req,res) =>{
   try{
     const author = await Author.findById(req.params.id)
     res.render("authors/edit" ,{ author : author})
@@ -66,7 +67,7 @@ router.get('/:id/edit', async (req,res) =>{
   }
 })
 
-router.put('/:id', async (req,res) =>{
+router.put('/:id',checkAuthenticated ,async (req,res) =>{
   let author
   try {
     author = await Author.findById(req.params.id)
@@ -86,7 +87,7 @@ router.put('/:id', async (req,res) =>{
   }
 })
 
-router.delete('/:id', async (req,res) =>{
+router.delete('/:id',checkAuthenticated, async (req,res) =>{
   let author
   try {
     author = await Author.findById(req.params.id)

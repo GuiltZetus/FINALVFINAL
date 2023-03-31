@@ -2,8 +2,11 @@ const express = require('express')
 const router = express.Router()
 const Book = require('../models/book')
 const Author = require('../models/author')
+const User = require('../models/user')
 const { findById } = require('../models/author')
 const imageMimeTypes = ['image/jpeg', 'image/png', 'images/gif']
+const {checkAuthenticated, checkNotAuthenticated, checkAuthenticateRole, checkAuthenticateEdit} = require('../authenticates')
+const book = require('../models/book')
 
 // All Books Route
 router.get('/', async (req, res) => {
@@ -29,7 +32,7 @@ router.get('/', async (req, res) => {
 })
 
 // New Book Route
-router.get('/new', async (req, res) => {
+router.get('/new',checkAuthenticated , async (req, res) => {
   renderNewPage(res, new Book())
 })
 
@@ -40,8 +43,10 @@ router.post('/', async (req, res) => {
     author: req.body.author,
     publishDate: new Date(req.body.publishDate),
     pageCount: req.body.pageCount,
-    description: req.body.description
+    description: req.body.description,
+    userPublisher : req.user.id,
   })
+
   saveCover(book, req.body.cover)
 
   try {
@@ -54,9 +59,9 @@ router.post('/', async (req, res) => {
 
 
 // show book routes
-router.get('/:id', async (req,res)=>{
+router.get('/:id' , async (req,res)=>{
   try{
-    const book = await Book.findById(req.params.id).populate('author').exec()
+    const book = await Book.findById(req.params.id).populate('author' && 'username').exec()
     res.render('books/show', { book : book })
   }
   catch{
@@ -65,7 +70,7 @@ router.get('/:id', async (req,res)=>{
 })
 
 // edit book routes
-router.get('/:id/edit', async (req, res) => {
+router.get('/:id/edit',checkAuthenticated,checkAuthenticateEdit,async (req, res) => {
   try{ 
     const book = await Book.findById(req.params.id)
     renderEditPage(res,book)
@@ -77,7 +82,7 @@ router.get('/:id/edit', async (req, res) => {
 })
 
 // Update Book Route
-router.put('/:id', async (req, res) => {
+router.put('/:id',checkAuthenticateEdit ,async (req, res) => {
   let book
 
   try {
@@ -104,7 +109,7 @@ router.put('/:id', async (req, res) => {
 
 // Delete Book Routes
 
-router.delete('/:id', async(req,res) => {
+router.delete('/:id',checkAuthenticated,checkAuthenticateEdit, async(req,res) => {
   let book
   try{
     book = await Book.findById(req.params.id)
@@ -163,5 +168,6 @@ function saveCover(book, coverEncoded) {
     book.coverImageType = cover.type
   }
 }
+
 
 module.exports = router
