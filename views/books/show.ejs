@@ -5,7 +5,6 @@
 <div>Publish Date: <%= book.publishDate.toDateString() %></div>
 <div>Page Count: <%= book.pageCount %></div>
 <div>Description: <%= book.desciption %></div>
-<div>Publisher: <%= book.userPublisher.username %></div>
 
 <a href="/books/<%= book.id %>/edit">Edit</a>
 <%- include('../partials/deleteForm',{url : `/books/${book.id}`}) %>

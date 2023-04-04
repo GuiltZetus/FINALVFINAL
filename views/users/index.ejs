@@ -1,2 +1,16 @@
-<h2>Welcome</h2>
+<h2>Welcome <%= username %></h2>
 
+<h2>Book you Published</h2>
+
+<div>
+  <% books.forEach(book => { %>
+    <a href="/books/<%= book.id %>">
+    <img height="150" width="100" src="<%= book.coverImagePath %>">
+    </a>
+  <% }) %>
+</div>
+
+<form action="/logout" method = "post">
+<button type="submit">Logout</button>
+
+</form>

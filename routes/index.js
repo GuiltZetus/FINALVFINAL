@@ -6,7 +6,6 @@ const User = require('../models/user')
 
 
 router.get('/', checkAuthenticated, async (req, res) => {
-  console.log(req.params.id)
   try {
     books = await Book.find().sort({ createdAt: 'desc' }).limit(10).exec()
     
